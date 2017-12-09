@@ -360,6 +360,17 @@ public class Derivation implements SemanticFn.Callable, HasScore {
   public String toRecursiveString() {
     return toRecursiveLispTree().toString();
   }
+  
+  public String toMinimalString() {
+	StringBuilder sb = new StringBuilder();
+	sb.append("[" + cat + " ");
+    for (Derivation child : children)
+      sb.append(child.toMinimalString());
+    if (children.isEmpty())
+      sb.append(formula.toLispTree());
+    sb.append("] ");
+    return sb.toString();
+  }
 
   // TODO(pliang): remove this in favor of localChoices
   private LispTree getRuleLispTree() {

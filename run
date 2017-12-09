@@ -64,6 +64,17 @@ end
 
 def figOpts; l(selo(:pooldir, 'execDir', 'exec', '_OUTPATH_'), o('overwriteExecDir'), o('addToView', 0)) end
 
+addMode('embeddings', 'Grammar to be paired with word embeddings', lambda { |e| l(
+  codalab, 'java', '-cp', 'libsempre/*:lib/*', '-ea', 'edu.stanford.nlp.sempre.Main',
+  o('Main.interactive'),
+  o('Builder.parser', 'EmbeddingBeamParser'),
+  #o('Parser.verbose', 9),
+
+  o('Grammar.inPaths', 'embeddings/sample0.grammar'),
+
+nil) })
+
+
 ############################################################
 # Unit tests
 

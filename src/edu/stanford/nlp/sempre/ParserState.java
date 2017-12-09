@@ -135,12 +135,12 @@ public abstract class ParserState {
 
     // Print out information
     if (Parser.opts.verbose >= 3) {
-      LogInfo.begin_track("ParserState.pruneCell(%s): %d derivations", cellDescription, derivations.size());
+//      LogInfo.begin_track("ParserState.pruneCell(%s): %d derivations", cellDescription, derivations.size());
       for (Derivation deriv : derivations) {
         LogInfo.logs("%s(%s,%s): %s %s, [score=%s] allAnchored: %s", deriv.cat, deriv.start, deriv.end, deriv.formula,
             deriv.canonicalUtterance, deriv.score, deriv.allAnchored());
       }
-      LogInfo.end_track();
+//      LogInfo.end_track();
     }
 
     // Max beam position (after sorting)
@@ -231,7 +231,7 @@ public abstract class ParserState {
 
   // Ensure that all the logical forms are executed and compatibilities are computed.
   public void ensureExecuted() {
-    LogInfo.begin_track("Parser.ensureExecuted");
+//    LogInfo.begin_track("Parser.ensureExecuted");
     // Execute predicted derivations to get value.
     for (Derivation deriv : predDerivations) {
       deriv.ensureExecuted(parser.executor, ex.context);
@@ -239,7 +239,7 @@ public abstract class ParserState {
         deriv.compatibility = parser.valueEvaluator.getCompatibility(ex.targetValue, deriv.value);
       if (!computeExpectedCounts && Parser.opts.executeTopFormulaOnly) break;
     }
-    LogInfo.end_track();
+//    LogInfo.end_track();
   }
 
   // Add statistics to |evaluation|.

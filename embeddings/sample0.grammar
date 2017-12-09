@@ -1,0 +1,22 @@
+# (def @put put)
+
+(rule $ROOT ($Action) (IdentityFn))
+(rule $Action ($ActionVerb $Object) (IdentityFn))
+
+(rule $ActionVerb (add) add)
+(rule $ActionVerb (remove) remove)
+(rule $ActionVerb (select) select)
+
+#(rule $Object ($Color $ObjectItem) (IdentityFn))
+(rule $Object ($Size $ObjectItem) (IdentityFn))
+(rule $Object ($ObjectItem) (IdentityFn))
+
+(rule $ObjectItem (box) box)
+(rule $ObjectItem (ball) ball)
+
+(for @size (large medium small)
+	(rule $Size (@size) @size)
+)
+#(for @color (red orange yellow green blue purple white black brown)
+	#(rule $Color (@color) @color)
+#)

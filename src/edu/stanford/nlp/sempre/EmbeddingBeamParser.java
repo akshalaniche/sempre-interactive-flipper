@@ -18,7 +18,7 @@ import java.util.*;
  *
  * @author Percy Liang
  */
-public class BeamParser extends Parser {
+public class EmbeddingBeamParser extends Parser {
   public static class Options {
     @Option public int maxNewTreesPerSpan = Integer.MAX_VALUE;
   }
@@ -26,7 +26,7 @@ public class BeamParser extends Parser {
 
   Trie trie;  // For non-cat-unary rules
 
-  public BeamParser(Spec spec) {
+  public EmbeddingBeamParser(Spec spec) {
     super(spec);
 
     // Index the non-cat-unary rules
@@ -43,15 +43,15 @@ public class BeamParser extends Parser {
   }
 
   public ParserState newParserState(Params params, Example ex, boolean computeExpectedCounts) {
-    BeamParserState coarseState = null;
+    EmbeddingBeamParserState coarseState = null;
     if (Parser.opts.coarsePrune) {
 //      LogInfo.begin_track("Parser.coarsePrune");
-      coarseState = new BeamParserState(this, params, ex, computeExpectedCounts, BeamParserState.Mode.bool, null);
+      coarseState = new EmbeddingBeamParserState(this, params, ex, computeExpectedCounts, EmbeddingBeamParserState.Mode.bool, null);
       coarseState.infer();
       coarseState.keepTopDownReachable();
 //      LogInfo.end_track();
     }
-    return new BeamParserState(this, params, ex, computeExpectedCounts, BeamParserState.Mode.full, coarseState);
+    return new EmbeddingBeamParserState(this, params, ex, computeExpectedCounts, EmbeddingBeamParserState.Mode.full, coarseState);
   }
 }
 
@@ -62,18 +62,21 @@ public class BeamParser extends Parser {
  * @author Percy Liang
  * @author Roy Frostig
  */
-class BeamParserState extends ChartParserState {
+/*
+ * 
+ */
+class EmbeddingBeamParserState extends ChartParserState {
   public final Mode mode;
   // Modes:
   // 1) Bool: just check if cells (cat, start, end) are reachable (to prune chart)
   // 2) Full: compute everything
   public enum Mode { bool, full }
 
-  private final BeamParser parser;
-  private final BeamParserState coarseState;  // Used to prune
+  private final EmbeddingBeamParser parser;
+  private final EmbeddingBeamParserState coarseState;  // Used to prune
 
-  public BeamParserState(BeamParser parser, Params params, Example ex, boolean computeExpectedCounts,
-                         Mode mode, BeamParserState coarseState) {
+  public EmbeddingBeamParserState(EmbeddingBeamParser parser, Params params, Example ex, boolean computeExpectedCounts,
+                         Mode mode, EmbeddingBeamParserState coarseState) {
     super(parser, params, ex, computeExpectedCounts);
     this.parser = parser;
     this.mode = mode;
@@ -207,7 +210,7 @@ class BeamParserState extends ChartParserState {
       Trie node,
       ArrayList<Derivation> children,
       IntRef numNew) {
-    if (node == null) return;
+    if (node == null) { return; }
     if (!coarseAllows(node, start, end)) return;
 
     if (Parser.opts.verbose >= 5) {
@@ -227,12 +230,28 @@ class BeamParserState extends ChartParserState {
       return;
     }
 
+    // ~~~
+    String token = ex.token(i);
+    Trie candidateNode = node.next(token);
+    if (candidateNode != null) {
     // Advance terminal token
-    applyNonCatUnaryRules(
-        start, end, i + 1,
-        node.next(ex.token(i)),
-        children,
-        numNew);
+      applyNonCatUnaryRules(
+          start, end, i + 1,
+          candidateNode,
+          children,
+          numNew);
+    } else {
+      for (String child : node.childrenKeySet()) {
+//        LogInfo.logs("Approximating word: %s\n", token);
+        applyNonCatUnaryRules(
+            start, end, i + 1,
+            node.next(child),
+            children,
+            numNew);
+      }
+      
+    }
+
 
     // Advance non-terminal category
     for (int j = i + 1; j <= end; j++) {
@@ -243,7 +262,7 @@ class BeamParserState extends ChartParserState {
           applyNonCatUnaryRules(start, end, j, nextNode, children, numNew);
           children.remove(children.size() - 1);
           if (mode != Mode.full) break;  // Only need one hypothesis
-          if (numNew.value >= BeamParser.opts.maxNewTreesPerSpan) return;
+          if (numNew.value >= EmbeddingBeamParser.opts.maxNewTreesPerSpan) return;
         }
       }
     }

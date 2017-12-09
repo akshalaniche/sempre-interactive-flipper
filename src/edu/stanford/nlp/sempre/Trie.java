@@ -19,6 +19,10 @@ public class Trie {
   public Set<String> cats = new LinkedHashSet<>();
 
   public Trie next(String item) { return children.get(item); }
+  
+  public Set<String> childrenKeySet() {
+    return children.keySet();
+  }
 
   public void add(Rule rule) { add(rule, 0); }
   private void add(Rule rule, int i) {

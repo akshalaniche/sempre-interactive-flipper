@@ -165,10 +165,10 @@ public abstract class Parser {
     // Parse
     StopWatch watch = new StopWatch();
     watch.start();
-    LogInfo.begin_track_printAll("Parser.parse: parse");
+//    LogInfo.begin_track_printAll("Parser.parse: parse");
     ParserState state = newParserState(params, ex, computeExpectedCounts);
     state.infer();
-    LogInfo.end_track();
+//    LogInfo.end_track();
     watch.stop();
     state.parseTime = watch.getCurrTimeLong();
     state.setEvaluation();
@@ -311,10 +311,12 @@ public abstract class Parser {
       // Either print all predictions or this prediction is worse by some amount.
       boolean print = printAllPredictions || ((probs[i] >= probs[0] / 2 || i < 10) && i < opts.maxPrintedPredictions);
       if (print) {
-        LogInfo.logs(
-            "Pred@%04d: %s [score=%s, prob=%s%s]", i, deriv.toString(),
-            Fmt.D(deriv.score), Fmt.D(probs[i]), compatibilities != null ? ", comp=" + Fmt.D(compatibilities[i]) : "");
-        // LogInfo.logs("Derivation tree: %s", deriv.toRecursiveString());
+//        LogInfo.logs(
+//            "Pred@%04d: %s [score=%s, prob=%s%s]", i, deriv.toString(),
+//            Fmt.D(deriv.score), Fmt.D(probs[i]), compatibilities != null ? ", comp=" + Fmt.D(compatibilities[i]) : "");
+		// HERE
+        //LogInfo.logs("Derivation tree: %s", deriv.toRecursiveString());
+        LogInfo.logs("Derivation tree: %s", deriv.toMinimalString());
         if (opts.dumpAllFeatures) FeatureVector.logFeatureWeights("Features", deriv.getAllFeatureVector(), state.params);
       }
     }

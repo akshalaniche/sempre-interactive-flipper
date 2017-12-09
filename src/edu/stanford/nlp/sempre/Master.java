@@ -235,7 +235,7 @@ public class Master {
     builder.parser.parse(builder.params, ex, false);
 
     response.ex = ex;
-    ex.logWithoutContext();
+//    ex.logWithoutContext();
     if (ex.predDerivations.size() > 0) {
       response.candidateIndex = 0;
       printDerivation(response.getDerivation());
@@ -255,13 +255,13 @@ public class Master {
     FeatureVector.logChoices("Pred", choices);
 
     // Print denotation
-    LogInfo.begin_track("Top formula");
-    LogInfo.logs("%s", deriv.formula);
-    LogInfo.end_track();
+//    LogInfo.begin_track("Top formula");
+//    LogInfo.logs("%s", deriv.formula);
+//    LogInfo.end_track();
     if (deriv.value != null) {
-      LogInfo.begin_track("Top value");
-      deriv.value.log();
-      LogInfo.end_track();
+//      LogInfo.begin_track("Top value");
+//      deriv.value.log();
+//      LogInfo.end_track();
     }
   }
 
