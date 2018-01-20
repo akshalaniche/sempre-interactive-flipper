@@ -72,6 +72,8 @@ class EmbeddingBeamParserState extends ChartParserState {
   // 2) Full: compute everything
   public enum Mode { bool, full }
 
+  // ~~~
+  public final String UNK_TOKEN = "unk";
   private final EmbeddingBeamParser parser;
   private final EmbeddingBeamParserState coarseState;  // Used to prune
 
@@ -230,19 +232,46 @@ class EmbeddingBeamParserState extends ChartParserState {
       return;
     }
 
-    // ~~~
+    // Original Code
+    /*
+     * 
+    applyNonCatUnaryRules(
+        start, end, i + 1,
+        node.next(ex.token(i)),
+        children,
+        numNew);
+     */
+
+    String token = ex.token(i);
+    Trie candidateNode = node.next(token);
+    if (candidateNode == null) {
+      candidateNode = node.next(UNK_TOKEN);
+//      LogInfo.logs("%s", candidateNode.cats);
+    }
+    applyNonCatUnaryRules(
+        start, end, i + 1,
+        candidateNode,
+        children,
+        numNew);
+    /*
+     * 
     String token = ex.token(i);
     Trie candidateNode = node.next(token);
     if (candidateNode != null) {
     // Advance terminal token
+      LogInfo.logs("Found: %s", token);
+      LogInfo.logs("%s", candidateNode.cats);
       applyNonCatUnaryRules(
           start, end, i + 1,
           candidateNode,
           children,
           numNew);
     } else {
+      LogInfo.logs("Could not find: %s", token);
+      LogInfo.logs("%s", node.cats);
       for (String child : node.childrenKeySet()) {
-//        LogInfo.logs("Approximating word: %s\n", token);
+        LogInfo.logs("Approximating: %s ? %s\n", child, token);
+        LogInfo.logs("%s", node.next(child).cats);
         applyNonCatUnaryRules(
             start, end, i + 1,
             node.next(child),
@@ -251,6 +280,8 @@ class EmbeddingBeamParserState extends ChartParserState {
       }
       
     }
+     */
+    // ~~~
 
 
     // Advance non-terminal category

@@ -37,6 +37,8 @@ public class Grammar {
     @Option public boolean binarizeRules = true;
     @Option(gloss = "Specifiy which ApplyFn to use: defaults to JoinFn when null")
     public String useApplyFn = null;
+    @Option(gloss = "Add an 'unknown' wildcard token to terinal categories.")
+    public boolean addUnkRules = false;
   }
 
   public static Options opts = new Options();
@@ -65,6 +67,24 @@ public class Grammar {
     for (String path : paths)
       readOnePath(path, Sets.newHashSet(opts.tags));
     verifyValid();
+    if (opts.addUnkRules)
+      addUnkRules();
+  }
+  
+  private void addUnkRules() {
+    LogInfo.logs("Adding unknown rules...");
+    List<Rule> newRules = new ArrayList<>();
+    Set<String> addedCats = new HashSet<>();
+    SemanticFn unkConstantFn = new ConstantFn(Formula.fromString("(string unk)"));
+    for (Rule r : rules) {
+      if (r.isRhsTerminals() && !addedCats.contains(r.lhs)) {
+        addedCats.add(r.lhs);
+        newRules.add(new Rule(r.lhs, Arrays.asList("unk"), unkConstantFn));
+        LogInfo.logs("Adding: %s", r.lhs);
+      }
+    }
+    //LogInfo.logs("New rules: %s", newRules);
+    rules.addAll(newRules);
   }
 
   private void verifyValid() {

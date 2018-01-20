@@ -3,7 +3,7 @@
 (rule $ROOT ($Action) (IdentityFn))
 (rule $Action ($ActionVerb $Object) (IdentityFn))
 
-(rule $ActionVerb (add) add)
+(rule $ActionVerb (build) build)
 (rule $ActionVerb (remove) remove)
 (rule $ActionVerb (select) select)
 
@@ -12,7 +12,7 @@
 (rule $Object ($ObjectItem) (IdentityFn))
 
 (rule $ObjectItem (box) box)
-(rule $ObjectItem (ball) ball)
+(rule $ObjectItem (sphere) sphere)
 
 (for @size (large medium small)
 	(rule $Size (@size) @size)
