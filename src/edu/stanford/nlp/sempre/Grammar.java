@@ -42,6 +42,8 @@ public class Grammar {
   }
 
   public static Options opts = new Options();
+  
+  public final String UNK_TOKEN = "unk";
 
   // All the rules in the grammar.  Each parser can read these and transform
   // them however the parser wishes.
@@ -72,18 +74,17 @@ public class Grammar {
   }
   
   private void addUnkRules() {
-    LogInfo.logs("Adding unknown rules...");
     List<Rule> newRules = new ArrayList<>();
     Set<String> addedCats = new HashSet<>();
-    SemanticFn unkConstantFn = new ConstantFn(Formula.fromString("(string unk)"));
+    SemanticFn unkConstantFn = new ConstantFn(Formula.fromString("(string " + UNK_TOKEN +")"));
     for (Rule r : rules) {
-      if (r.isRhsTerminals() && !addedCats.contains(r.lhs)) {
+      if (r.isRhsTerminals()
+          && !addedCats.contains(r.lhs)
+          && !(r.getInfoTag("noUnk") > 0.0)) {
         addedCats.add(r.lhs);
-        newRules.add(new Rule(r.lhs, Arrays.asList("unk"), unkConstantFn));
-        LogInfo.logs("Adding: %s", r.lhs);
+        newRules.add(new Rule(r.lhs, Arrays.asList(UNK_TOKEN), unkConstantFn));
       }
     }
-    //LogInfo.logs("New rules: %s", newRules);
     rules.addAll(newRules);
   }
 

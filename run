@@ -71,6 +71,7 @@ addMode('embeddings', 'Grammar to be paired with word embeddings', lambda { |e| 
   #o('Parser.verbose', 9),
 
   o('Grammar.inPaths', 'embeddings/sample0.grammar'),
+  o('Grammar.addUnkRules', true),
 
 nil) })
 

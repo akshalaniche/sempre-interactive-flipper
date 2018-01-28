@@ -11,8 +11,8 @@
 (rule $Object ($Size $ObjectItem) (IdentityFn))
 (rule $Object ($ObjectItem) (IdentityFn))
 
-(rule $ObjectItem (box) box)
-(rule $ObjectItem (sphere) sphere)
+(rule $ObjectItem (box) box (noUnk 1.0))
+(rule $ObjectItem (sphere) sphere (noUnk 1.0))
 
 (for @size (large medium small)
 	(rule $Size (@size) @size)
