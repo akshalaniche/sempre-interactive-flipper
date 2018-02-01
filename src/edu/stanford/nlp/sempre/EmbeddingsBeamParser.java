@@ -3,6 +3,7 @@ package edu.stanford.nlp.sempre;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
+import edu.stanford.nlp.sempre.embeddings.Embeddings;
 import fig.basic.*;
 import fig.exec.Execution;
 
@@ -18,15 +19,19 @@ import java.util.*;
  *
  * @author Percy Liang
  */
-public class EmbeddingBeamParser extends Parser {
+public class EmbeddingsBeamParser extends Parser {
   public static class Options {
     @Option public int maxNewTreesPerSpan = Integer.MAX_VALUE;
+    @Option(gloss="The file path from which to retrieve the word embeddings")
+    String embeddingsPath = "";
   }
   public static Options opts = new Options();
 
   Trie trie;  // For non-cat-unary rules
+  Embeddings embeddings;
 
-  public EmbeddingBeamParser(Spec spec) {
+
+  public EmbeddingsBeamParser(Spec spec) {
     super(spec);
 
     // Index the non-cat-unary rules
@@ -35,6 +40,8 @@ public class EmbeddingBeamParser extends Parser {
       addRule(rule);
     if (Parser.opts.visualizeChartFilling)
       this.chartFillOut = IOUtils.openOutAppendEasy(Execution.getFile("chartfill"));
+    
+    embeddings = new Embeddings(opts.embeddingsPath, this.grammar.rules);
   }
 
   public synchronized void addRule(Rule rule) {
@@ -74,10 +81,10 @@ class EmbeddingBeamParserState extends ChartParserState {
 
   // ~~~
   public final String UNK_TOKEN = "unk";
-  private final EmbeddingBeamParser parser;
+  private final EmbeddingsBeamParser parser;
   private final EmbeddingBeamParserState coarseState;  // Used to prune
 
-  public EmbeddingBeamParserState(EmbeddingBeamParser parser, Params params, Example ex, boolean computeExpectedCounts,
+  public EmbeddingBeamParserState(EmbeddingsBeamParser parser, Params params, Example ex, boolean computeExpectedCounts,
                          Mode mode, EmbeddingBeamParserState coarseState) {
     super(parser, params, ex, computeExpectedCounts);
     this.parser = parser;
@@ -293,7 +300,7 @@ class EmbeddingBeamParserState extends ChartParserState {
           applyNonCatUnaryRules(start, end, j, nextNode, children, numNew);
           children.remove(children.size() - 1);
           if (mode != Mode.full) break;  // Only need one hypothesis
-          if (numNew.value >= EmbeddingBeamParser.opts.maxNewTreesPerSpan) return;
+          if (numNew.value >= EmbeddingsBeamParser.opts.maxNewTreesPerSpan) return;
         }
       }
     }

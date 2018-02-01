@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,49 +18,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
+
+import edu.stanford.nlp.sempre.Grammar;
+import edu.stanford.nlp.sempre.Rule;
 
 public class Embeddings {
 
 	Dictionary dict;
 	final Map<String,Set<Word>> categories = new HashMap<>();
 	
-	// TODO Make this interface with the grammar
-	public void initializeCategories(Dictionary dict) {
-	  Set<Word> verbs = new HashSet<>(
-	      Arrays.asList(
-	          dict.entries.get("build"),
-	          dict.entries.get("remove"),
-	          dict.entries.get("find")));
-	  Set<Word> nouns = new HashSet<>(
-	      Arrays.asList(
-	          dict.entries.get("box"),
-	          dict.entries.get("bar")));
-	  Set<Word> adjectives = new HashSet<>(
-	      Arrays.asList(
-	          dict.entries.get("large"),
-	          dict.entries.get("medium"),
-	          dict.entries.get("small")));
-	  
-	  categories.put("build", verbs);
-	  categories.put("remove", verbs);
-	  categories.put("find", verbs);
-	  categories.put("box", nouns);
-	  categories.put("bar", nouns);
-	  categories.put("large", adjectives);
-	  categories.put("medium", adjectives);
-	  categories.put("small", adjectives);
-	}
-	
-	public Embeddings(String embeddingsPath) {
-	  
-		Reader reader = new Reader(embeddingsPath);
-		this.dict = new Dictionary(reader);
-	  initializeCategories(dict);
-		
-	  
-	}
-
 	static double dot(List<Double> l1, List<Double> l2) {
 		double sum = 0.0;
 		for (int i = 0; i < l1.size(); ++i)
@@ -71,6 +40,56 @@ public class Embeddings {
 		return dot(w1.scalars, w2.scalars)/(w1.mag() * w2.mag());
 	}
 	
+	
+	public Embeddings(String embeddingsPath, Collection<Rule> rules) {
+	  
+		Reader reader = new Reader(embeddingsPath);
+		this.dict = new Dictionary(reader);
+	  initializeCategories(rules, dict);
+	}
+
+	public String bestMatch(String category, String token) {
+	  // What should happen if something is not found?
+    Word tokenVec = dict.entries.getOrDefault(token, Word.nullWord);
+    if (tokenVec.equals(Word.nullWord))
+      return "ERR_NOT_FOUND";
+		Set<Word> set = categories.get(category);
+		double max = -1.1; // cosine min is -1.0
+		Word maxWord = null;
+		for (Word word : set) {
+		  double sim = sim(word, tokenVec);
+		  if (sim > max) {
+		    maxWord = word;
+		    max = sim;
+		  }
+		}
+		return maxWord.name;
+	}
+	
+//	public String bestMatchSafe(String category, String token) {
+//	  new Random().nextInt()
+//	}
+	
+	// TODO How should I properly handle when a word is not contained in the
+	// embeddings? 
+	void initializeCategories(Collection<Rule> rules, Dictionary dict) {
+    for (Rule r : rules) {
+      if (!r.isRhsTerminals() || r.rhs.get(0).equals(Grammar.UNK_TOKEN))
+        continue;
+      
+      if (!categories.containsKey(r.lhs))
+        categories.put(r.lhs, new HashSet<>());
+      Set<Word> set = categories.get(r.lhs);
+      Word w = dict.entries.get(r.rhs.get(0));
+      if (w == null) {
+        w = Word.zeroWordLike(r.rhs.get(0),
+            dict.entries.entrySet().iterator().next().getValue());
+      }
+      set.add(w);
+    }
+	}
+
+
 	
 	/*
   static int testPair(Dictionary dict, String target, String token) {

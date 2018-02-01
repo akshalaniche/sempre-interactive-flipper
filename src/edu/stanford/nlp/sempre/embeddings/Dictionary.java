@@ -1,14 +1,9 @@
 package edu.stanford.nlp.sempre.embeddings;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
-public class Dictionary implements Serializable {
+public class Dictionary {
 	
-	/**
-   * 
-   */
-  private static final long serialVersionUID = -910722549301640487L;
   HashMap<String,Word> entries;
 	
 	public Dictionary(Reader r) {

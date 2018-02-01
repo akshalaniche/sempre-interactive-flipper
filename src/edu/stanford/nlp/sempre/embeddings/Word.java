@@ -1,20 +1,37 @@
 package edu.stanford.nlp.sempre.embeddings;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Word {
 	
+  public static final Word nullWord = new Word("NULL_WORD", null);
+  
 	final ArrayList<Double> scalars;
 	final String name;
 	
-	public Word(String line) {
+	/**
+	 * Create an arbitrary word corresponding to a zero vector with
+	 * the same dimensions as a given word.
+	 * @param name
+	 * @param like
+	 * @return
+	 */
+	public static Word zeroWordLike(String name, Word like) {
+	  ArrayList<Double> zeros =
+	      new ArrayList<>(Collections.nCopies(like.scalars.size(), 0.0));
+	  return new Word(name, zeros);
+	}
+	
+	public static Word wordFromString(String line) {
 		String[] vals = line.split(" ");
-		this.name = vals[0];
-		this.scalars = new ArrayList<>();
+		String name = vals[0];
+		ArrayList<Double> scalars = new ArrayList<>();
 		for (int i = 1; i < vals.length; ++i) {
-			this.scalars.add(Double.valueOf(vals[i]));
+			scalars.add(Double.valueOf(vals[i]));
 		}
+		return new Word(name, scalars);
 	}
 	
 	public Word(String name, ArrayList<Double> scalars) {

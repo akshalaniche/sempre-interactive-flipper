@@ -28,7 +28,7 @@ public class Reader {
 		HashMap<String,Word> words = new HashMap<>();
 		try {
 			while (br.ready()) {
-				Word w = new Word(br.readLine());
+				Word w = Word.wordFromString(br.readLine());
 				words.put(w.name, w);
 			}
 		} catch (IOException e) {

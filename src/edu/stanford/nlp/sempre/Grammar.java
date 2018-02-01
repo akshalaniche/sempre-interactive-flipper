@@ -43,7 +43,7 @@ public class Grammar {
 
   public static Options opts = new Options();
   
-  public final String UNK_TOKEN = "unk";
+  public static final String UNK_TOKEN = "unk";
 
   // All the rules in the grammar.  Each parser can read these and transform
   // them however the parser wishes.
@@ -76,7 +76,7 @@ public class Grammar {
   private void addUnkRules() {
     List<Rule> newRules = new ArrayList<>();
     Set<String> addedCats = new HashSet<>();
-    SemanticFn unkConstantFn = new ConstantFn(Formula.fromString("(string " + UNK_TOKEN +")"));
+    SemanticFn unkConstantFn = new ConstantFn(Formula.fromString(UNK_TOKEN));
     for (Rule r : rules) {
       if (r.isRhsTerminals()
           && !addedCats.contains(r.lhs)
@@ -247,7 +247,6 @@ public class Grammar {
     }
     throw new RuntimeException("Expected a single tag, but got: " + tree);
   }
-
 
   public void interpretMacroDef(LispTree tree) {
     if (tree.children.size() != 3 || !tree.child(1).isLeaf()) {
