@@ -197,6 +197,7 @@ public class InteractiveServer {
             item.put("prob", deriv.getProb());
             item.put("anchored", deriv.allAnchored()); // used only anchored rules
             item.put("formula", deriv.formula.toLispTree().toString());
+            item.put("prettyString", deriv.formula.prettyString());
             items.add(item);
           }
         }
