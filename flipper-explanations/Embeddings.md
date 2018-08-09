@@ -11,12 +11,11 @@ During the computation of the longest common subsequence, instead of having a di
 The similarity between words can be computed in one of five ways:
 - Lin et al. algorithm (LIN)
 - Wu-Palmer algorithm (WPU)
-- Hirst-St-Onge algorithm (HSO)
 - Path algorithm (PATH)
 - word vector cosine similarity (W2V)
 
 ## WordNet embeddings
-LIN, WPU, HSO, PATH depend on WordNet embeddings. 
+LIN, WPU, PATH depend on WordNet embeddings. 
 
 They require the JAR files: [`jaw-jaw-1.0.2.jar`](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/jawjaw/jawjaw-1.0.2.jar) and [`ws4j-1.0.1.jar`](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/ws4j/ws4j-1.0.1.jar)
 (see function `computeSimilarityWordNet()` in `edu.stanford.nlp.sempre.interactive.InteractiveEmbeddingsBeamParser.java`)
@@ -32,7 +31,7 @@ The similarity computation for the longest common subsequence is handled by the 
 # Running the application with word embeddings
 Run the program with the option `-Parser "interactive.InteractiveEmbeddingsBeamParser"` to select the correct Parser.
 
-The similarity measure used is selected with the option `-InteractiveEmbeddingsBeamParser.sim`, with one of `LIN`, `WPU`, `HSO`, `PATH`, `W2V`.
+The similarity measure used is selected with the option `-InteractiveEmbeddingsBeamParser.sim`, with one of `LIN`, `WPU`, `PATH`, `W2V`.
 
 The path to the word vector embeddings is given with the option  `-InteractiveEmbeddingsBeamParser.embeddingsPath`. (Necessary when using W2V)
 

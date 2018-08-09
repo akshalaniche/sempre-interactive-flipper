@@ -29,7 +29,6 @@ public class InteractiveEmbeddingsBeamParser extends InteractiveBeamParser {
 	public enum SimilarityMeasure {
 		LIN,
 		WUP,
-		HSO,
 		PATH,
 		W2V
 	}
@@ -45,7 +44,7 @@ public class InteractiveEmbeddingsBeamParser extends InteractiveBeamParser {
 	private static ILexicalDatabase db = new NictWordNet();	
 	//option of similarity metrics that use 
 	public final static RelatednessCalculator[] rcs = 
-		{ new Lin(db), new WuPalmer(db), new HirstStOnge(db), new Path(db) };
+		{ new Lin(db), new WuPalmer(db), new Path(db) };
 	
 	public final Embeddings embeddings;
 
@@ -112,9 +111,6 @@ class InteractiveEmbeddingsBeamParserState extends InteractiveBeamParserState {
 	private double computeSimilarityWordNet(String word1, String word2, int calculator) {
 		WS4JConfiguration.getInstance().setMFS(false);
 		double s = InteractiveEmbeddingsBeamParser.rcs[calculator].calcRelatednessOfWords(word1, word2);
-		//Upper Bound for HSO is 16
-		if (calculator == 2)
-			s = s / 16;
 		return s;
 	}
 	
@@ -136,7 +132,8 @@ class InteractiveEmbeddingsBeamParserState extends InteractiveBeamParserState {
 			return 0.0;	
 		
 		double cosSim = Embeddings.sim(w1, w2); //cosine similarity, range = [-1, 1]
-		return (cosSim + 1) / 2.0;
+		return cosSim;
+		//return (cosSim + 1) / 2.0;
 	}
 	
 	/**
