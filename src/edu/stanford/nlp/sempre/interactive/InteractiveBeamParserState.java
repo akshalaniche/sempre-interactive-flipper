@@ -935,11 +935,7 @@ public class InteractiveBeamParserState extends ChartParserState {
 	  
 	  int uttLen = rhs.size();
 	  int ruleLen = ruleRHS.size();
-	  int longerLen = Math.max(uttLen, ruleLen);
-	  
-	  // their lengths have to really be the same
-	  if (longerLen <= 0) return 0.0; 	//invalid length
-	  
+	  	  
 	  //check if the categories (start with '$') in both RHS are equal
 	  List<String> rhsCat = rhs.stream().filter(s -> s.startsWith("$")).collect(Collectors.toList());
 	  List<String> ruleRhsCat = ruleRHS.stream().filter(s -> s.startsWith("$")).collect(Collectors.toList());
@@ -954,8 +950,7 @@ public class InteractiveBeamParserState extends ChartParserState {
 		  LogInfo.logs("Longest common subsequence length: %s", longestSubsequence);
 	  }
 	  
-	  //similarity = (2 * longestSubsequence) / (double) (uttLen + ruleLen);
-	  similarity = longestSubsequence / (double) longerLen;
+	  similarity = (2 * longestSubsequence) / (double) (uttLen + ruleLen);
 	  
 	  if (similarity < 0.0 || similarity > 1.0)
 		  throw new RuntimeException("Computational problem for similarity with rule " + rule.toString());
